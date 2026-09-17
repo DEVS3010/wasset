@@ -1,6 +1,6 @@
 name: waseet
 description: app for buy and sell real-estates
-version: 1.0.20+4
+version: 1.0.20+60
 publish_to: none
 
 environment:
