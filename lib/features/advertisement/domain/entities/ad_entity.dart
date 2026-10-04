@@ -1,12 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:waseet/features/advertisement/domain/entities/ad_creator_summary.dart';
 import 'package:waseet/features/user/domain/entities/category/category_entity.dart';
 import 'package:waseet/features/user/domain/entities/cities_entity.dart';
 import 'package:waseet/features/user/domain/entities/neighborhood_entity.dart';
-import 'package:waseet/features/user/domain/entities/wasset_user.dart';
 
 class AdEntity {
   int? id;
-  WassetUser? createdBy;
+  AdCreatorSummary? createdBy;
   String? typeOfAdvertisement;
   String? typeOfAdvertisementExtra;
   CategoryEntity? category;

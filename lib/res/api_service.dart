@@ -1,9 +1,8 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:waseet/constants/constants.dart';
+import 'package:waseet/res/api_failure.dart';
 import 'package:waseet/res/shared_preferences.dart';
 
 class ApiService {
@@ -109,71 +108,20 @@ class ApiService {
   }) async {
     headers = await addToken(headers);
 
-    late Response<T> res;
     try {
-      await _dio
-          .post<T>(
+      final res = await _dio.post<T>(
         path,
         data: data,
         onSendProgress: onSendProgress,
         onReceiveProgress: onReceiveProgress,
         queryParameters: queryParameters,
-        options: Options(
-          headers: headers,
-          extra: extra,
-        ),
-      )
-          .then((value) {
-        if (value.statusCode == 200) {
-          res = value;
-        }
-        if (value.statusCode == 201) {
-          res = value;
-        }
-        if (value.statusCode == 408) {
-          post<T>(
-            path,
-            data: data,
-            onReceiveProgress: onReceiveProgress,
-            headers: headers,
-            extra: extra,
-            queryParameters: queryParameters,
-          );
-        }
-        if (value.statusCode == 401) {
-          wassetSharedPreferences.removeToken();
-        }
-      });
+        options: Options(headers: headers, extra: extra),
+      );
+      return res.data;
     } on DioException catch (e) {
-      // log('wwwwwwww${(e.requestOptio
       errorInterceptor(e);
-      //ns.data as FormData).fields}');
-      // log('wwwwwwww${(e.requestOptions.data as FormData).files}');
-      // if (e.response?.statusCode == 401) {
-      //   wassetSharedPreferences.removeToken();
-      // }
-      // if (e.response?.statusCode == 400) {
-      //   res = Response<T>(
-      //     requestOptions: e.requestOptions,
-      //     data: e.response?.data as T,
-      //     statusCode: e.response?.statusCode,
-      //     statusMessage: e.response?.statusMessage,
-      //   );
-      // } else {
-      //   if (e.response?.statusCode == 422) {
-      //     res = Response<T>(
-      //       requestOptions: e.requestOptions,
-      //       data: e.response?.data as T,
-      //       statusCode: e.response?.statusCode,
-      //       statusMessage: e.response?.statusMessage,
-      //     );
-      //   } else {
-      //     log(e.toString());
-      //     errorInterceptor(e);
-      //   }
-      // }
+      rethrow;
     }
-    return res.data;
   }
 
   Future<T?> put<T>(
@@ -281,18 +229,7 @@ class ApiService {
     if (dioError.response?.statusCode == 401) {
       wassetSharedPreferences.removeToken();
     }
-    if ((dioError.response?.statusCode ?? 400) >= 400
-        // && dioError.response?.statusCode != 422
-        ) {
-      final responseDate = dioError.response?.data;
-      if (responseDate is Map<String, dynamic>) {
-        final message = (responseDate['message'] as String?) ??
-            (responseDate['error'] as String?) ??
-            'حدث خطأ ما';
-        log(message);
-        throw Exception(message);
-      }
-    }
+    throw ApiFailure.fromDio(dioError);
   }
 
   Future<Map<String, dynamic>> addToken([Map<String, dynamic>? headers]) async {

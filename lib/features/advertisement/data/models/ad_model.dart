@@ -1,9 +1,9 @@
+import 'package:waseet/features/advertisement/domain/entities/ad_creator_summary.dart';
 import 'package:waseet/features/advertisement/domain/entities/ad_entity.dart';
 import 'package:waseet/features/user/data/models/category_model.dart';
 import 'package:waseet/features/user/data/models/home/cities_model.dart';
 import 'package:waseet/features/user/data/models/home/neighborhood.model.dart';
-import 'package:waseet/features/user/data/models/wasset_user_model.dart';
-import 'package:waseet/features/user/domain/entities/wasset_user.dart';
+import 'package:waseet/features/user/domain/entities/cities_entity.dart';
 
 class AdModel {
   AdModel({
@@ -39,11 +39,14 @@ class AdModel {
   });
 
   factory AdModel.fromJson(Map<String, dynamic> json) {
+    if (json['id'] is! int) {
+      throw const FormatException('Advertisement id must be an integer');
+    }
     return AdModel(
       id: json['id'] as int?,
       createdBy: json['created_by'] == null
           ? null
-          : WassetUserModel.fromMap(
+          : AdCreatorSummary.fromJson(
               json['created_by'] as Map<String, dynamic>,
             ),
       typeOfAdvertisement: json['type_of_advertisement'] as String?,
@@ -102,7 +105,7 @@ class AdModel {
     );
   }
   int? id;
-  WassetUserModel? createdBy;
+  AdCreatorSummary? createdBy;
   String? typeOfAdvertisement;
   String? typeOfAdvertisementExtra;
   CategoryModel? category;
@@ -132,13 +135,21 @@ class AdModel {
   List<String> images;
 
   AdEntity toEntity() {
+    final adCity = city;
     return AdEntity(
       id: id,
-  createdBy: createdBy != null ? WassetUser.fromModel(createdBy!) : null,
+      createdBy: createdBy,
       typeOfAdvertisement: typeOfAdvertisement,
       typeOfAdvertisementExtra: typeOfAdvertisementExtra,
       category: category?.toEntity(),
-      city: city?.toEntity(),
+      city: adCity == null
+          ? null
+          : CitiesEntity(
+              id: adCity.id ??
+                  (throw const FormatException('City id is required')),
+              name: adCity.name ?? '',
+              image: adCity.image ?? '',
+            ),
       neighborhood: neighborhood?.toEntity(),
       latitude: latitude,
       longitude: longitude,

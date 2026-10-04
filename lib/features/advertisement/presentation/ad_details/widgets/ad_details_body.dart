@@ -37,6 +37,11 @@ class AdDetailsBody extends StatelessWidget {
         }
 
         final ad = state.ad;
+        if (ad == null) return const SizedBox.shrink();
+        final creatorId = ad.createdBy?.id;
+        final phone = ad.contactPhone ??
+            ad.createdBy?.profile?.phone ??
+            ad.createdBy?.phone;
         return SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10).r,
@@ -44,7 +49,7 @@ class AdDetailsBody extends StatelessWidget {
               children: [
                 Column(
                   children: [
-                    if (ad!.images?.isNotEmpty ?? false)
+                    if (ad.images?.isNotEmpty ?? false)
                       Container(
                         height: 0.25.sh,
                         decoration: BoxDecoration(
@@ -265,7 +270,7 @@ class AdDetailsBody extends StatelessWidget {
                     ),
                     SizedBox(height: 10.h),
                     InkWell(
-                      onTap: () {
+                      onTap: creatorId == null ? null : () {
                         context.pushNamed(
                           Screens.myPersonalOffice.name,
                           extra: {
@@ -328,18 +333,22 @@ class AdDetailsBody extends StatelessWidget {
                             // TODO: add call and message functionality
                             BrokerItemIcon(
                               onTap: () {
-                                if (ad.communicationMethod == 'call') {
+                                if (ad.communicationMethod == 'call' &&
+                                    phone != null && phone.isNotEmpty) {
                                   HelperMethod.openCall(
-                                    ad.createdBy!.phone!,
+                                    phone,
                                   );
                                 } else if (ad.communicationMethod ==
-                                    'whatsapp') {
+                                    'whatsapp' && phone != null &&
+                                    phone.isNotEmpty) {
                                   HelperMethod.openWhatsapp(
-                                    ad.createdBy!.phone!,
+                                    phone,
                                   );
-                                } else {
+                                } else if (ad.communicationMethod != 'call' &&
+                                    ad.communicationMethod != 'whatsapp' &&
+                                    creatorId != null) {
                                   HelperMethod.createChatRoom(
-                                    ad.createdBy!.id,
+                                    creatorId,
                                     context,
                                   );
                                 }

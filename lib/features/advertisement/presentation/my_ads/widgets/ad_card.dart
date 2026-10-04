@@ -160,10 +160,12 @@ class AdCard extends StatelessWidget {
                               children: [
                                 BrokerItemIcon(
                                   onTap: () {
-                                    HelperMethod.createChatRoom(
-                                      ad.createdBy!.id,
-                                      context,
-                                    );
+                                    final creatorId = ad.createdBy?.id;
+                                    if (creatorId != null) {
+                                      HelperMethod.createChatRoom(
+                                        creatorId, context,
+                                      );
+                                    }
                                   },
                                   icon: Icons.message,
                                 ),

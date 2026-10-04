@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
+import 'package:waseet/features/advertisement/data/models/ad_failure.dart';
 import 'package:waseet/features/advertisement/data/models/ad_response.dart';
 import 'package:waseet/features/advertisement/data/models/verify_license_response.dart';
 import 'package:waseet/features/advertisement/data/models/post_response.dart';
@@ -12,6 +13,7 @@ import 'package:waseet/features/advertisement/domain/entities/request/add_ad_req
 import 'package:waseet/features/advertisement/domain/entities/request/add_new_post_request.dart';
 import 'package:waseet/features/advertisement/domain/entities/request/get_posts_request.dart';
 import 'package:waseet/features/brokers/domain/entities/request/get_ads_param.dart';
+import 'package:waseet/res/api_failure.dart';
 import 'package:waseet/res/api_service.dart';
 import 'package:waseet/res/resource.dart';
 import 'package:waseet/res/shared_preferences.dart';
@@ -34,13 +36,16 @@ class AdDatasource {
           if (param?.brokerId != null) 'filter[user_id]': param!.brokerId,
         },
       );
-      final ad = AdResponse.fromMap(response!);
+      if (response == null || response['data'] == null) {
+        return adFailure(ApiFailure.fromBody(response));
+      }
+      final ad = AdResponse.fromMap(response);
       if (ad.data != null) {
         return Resource.success(ad.data!.map((e) => e.toEntity()).toList());
       }
-      return Resource.error(ad.message ?? 'error', null, ad.errors);
+      return adFailure(ApiFailure.fromBody(response));
     } catch (e) {
-      return Resource.error(e.toString());
+      return adFailure(e);
     }
   }
 
@@ -49,13 +54,16 @@ class AdDatasource {
       final response = await _apiServices.get<Map<String, dynamic>>(
         '/users/advertisements/favorites',
       );
-      final ad = AdResponse.fromMap(response!);
+      if (response == null || response['data'] == null) {
+        return adFailure(ApiFailure.fromBody(response));
+      }
+      final ad = AdResponse.fromMap(response);
       if (ad.data != null) {
         return Resource.success(ad.data!.map((e) => e.toEntity()).toList());
       }
-      return Resource.error(ad.message ?? 'error', null, ad.errors);
+      return adFailure(ApiFailure.fromBody(response));
     } catch (e) {
-      return Resource.error(e.toString());
+      return adFailure(e);
     }
   }
 
@@ -67,9 +75,12 @@ class AdDatasource {
         '/advertisements',
         data: dio.FormData.fromMap(body),
       );
-      final ad = AdResponse.fromMap(response!);
+      if (response == null || response['data'] == null) {
+        return adFailure(ApiFailure.fromBody(response));
+      }
+      final ad = AdResponse.fromMap(response);
       // List<AdModel>
-      if (ad.data != null) {
+      if (ad.data?.isNotEmpty ?? false) {
         // final images = <dio.MultipartFile>[];
         // for (final image in adRequest.images) {
         //   images.add(
@@ -92,9 +103,9 @@ class AdDatasource {
         return Resource.success(ad.data!.first.toEntity());
       }
 
-      return Resource.error(ad.message ?? 'error', null, ad.errors);
+      return adFailure(ApiFailure.fromBody(response));
     } catch (e) {
-      return Resource.error(e.toString());
+      return adFailure(e);
     }
   }
 
@@ -124,7 +135,7 @@ class AdDatasource {
       final f = files[i];
 
       if (!f.existsSync()) {
-        return Resource.error('file not found: ${f.path}');
+        return Resource.error('تعذر قراءة المرفق. يرجى اختياره مرة أخرى.');
       }
 
       final fileName = f.uri.pathSegments.isNotEmpty
@@ -142,11 +153,6 @@ class AdDatasource {
       );
     }
 
-    // Debug: confirm keys
-    for (final e in form.files) {
-      log('multipart file -> key: ${e.key}, filename: ${e.value.filename}');
-    }
-
     final response = await _apiServices.post<Map<String, dynamic>>(
       '/advertisements/create-with-verification',
       data: form,
@@ -154,20 +160,20 @@ class AdDatasource {
         'Accept': 'application/json',
         // IMPORTANT: do NOT set Content-Type manually for multipart
       },
-      onSendProgress: (int sent, int total) {
-        log('upload progress: $sent / $total');
-      },
     );
 
-    final ad = AdResponse.fromMap(response!);
+    if (response == null || response['data'] == null) {
+      return adFailure(ApiFailure.fromBody(response));
+    }
+    final ad = AdResponse.fromMap(response);
 
     if (ad.data != null && ad.data!.isNotEmpty) {
       return Resource.success(ad.data!.first.toEntity());
     }
 
-    return Resource.error(ad.message ?? 'error', null, ad.errors);
+    return adFailure(ApiFailure.fromBody(response));
   } catch (e) {
-    return Resource.error(e.toString());
+    return adFailure(e);
   }
 }
 
@@ -179,13 +185,16 @@ class AdDatasource {
           'filter[id]': id,
         },
       );
-      final ad = AdResponse.fromMap(response!);
-      if (ad.data != null) {
+      if (response == null || response['data'] == null) {
+        return adFailure(ApiFailure.fromBody(response));
+      }
+      final ad = AdResponse.fromMap(response);
+      if (ad.data?.isNotEmpty ?? false) {
         return Resource.success(ad.data!.first.toEntity());
       }
-      return Resource.error(ad.message ?? 'error', null, ad.errors);
+      return adFailure(ApiFailure.fromBody(response));
     } catch (e) {
-      return Resource.error(e.toString());
+      return adFailure(e);
     }
   }
 
@@ -201,13 +210,16 @@ class AdDatasource {
         },
       );
 
-      final ad = AdResponse.fromMap(response!);
+      if (response == null || response['data'] == null) {
+        return adFailure(ApiFailure.fromBody(response));
+      }
+      final ad = AdResponse.fromMap(response);
       if (ad.data != null && ad.data!.isNotEmpty) {
         return Resource.success(ad.data!.first.toEntity());
       }
-      return Resource.error(ad.message ?? 'error', null, ad.errors);
+      return adFailure(ApiFailure.fromBody(response));
     } catch (e) {
-      return Resource.error(e.toString());
+      return adFailure(e);
     }
   }
 
@@ -223,7 +235,7 @@ class AdDatasource {
         },
       );
 
-      if (response == null) return Resource.error('empty response');
+      if (response == null) return adFailure(null);
 
       // parse response.data
       final data = response['data'] as Map<String, dynamic>?;
@@ -231,9 +243,9 @@ class AdDatasource {
         final model = VerifyLicenseModel.fromMap(data);
         return Resource.success(model);
       }
-      return Resource.error(response['message'] as String? ?? 'error');
+      return adFailure(ApiFailure.fromBody(response));
     } catch (e) {
-      return Resource.error(e.toString());
+      return adFailure(e);
     }
   }
 

@@ -39,6 +39,7 @@ class _AdvertiserCheckPageState extends State<AdvertiserCheckPage> {
   }
 
   Future<void> _search() async {
+    if (_submitting) return;
     final advertiserId = _advertiserController.text.trim();
     final license = _licenseController.text.trim();
     if (advertiserId.isEmpty || license.isEmpty) {
@@ -58,6 +59,7 @@ class _AdvertiserCheckPageState extends State<AdvertiserCheckPage> {
     final repo = context.read<AdRepository>();
     // Use verification endpoint only (returns the full dataset)
     final verifyRes = await repo.verifyLicense(advertiserId, license);
+    if (!mounted) return;
     if (verifyRes is ResourceSuccess<VerifyLicenseEntity?>) {
       final ver = verifyRes.data;
       setState(() => _submitting = false);
@@ -77,7 +79,7 @@ class _AdvertiserCheckPageState extends State<AdvertiserCheckPage> {
       return;
     }
     setState(() => _submitting = false);
-    final message = (verifyRes as ResourceError).message;
+    final message = verifyRes.message;
     log('AdvertiserCheckPage: verifyLicense error: $message');
     HelperMethod.showSnackBar(
       context,
@@ -315,7 +317,7 @@ class _AdvertisementPreviewPageState extends State<AdvertisementPreviewPage> {
                                       toAdd = compressed;
                                     }
 
-                                    if (!mounted) return;
+                                    if (!mounted || !context.mounted) return;
                                     setState(() => _attachments.add(toAdd));
                                   }
                                 },
@@ -364,6 +366,7 @@ class _AdvertisementPreviewPageState extends State<AdvertisementPreviewPage> {
                     onPressed: _submitting
                         ? null
                         : () async {
+                            if (_submitting) return;
                             setState(() => _submitting = true);
                             final repo = context.read<AdRepository>();
                             final verify = widget.verify;
@@ -377,6 +380,7 @@ class _AdvertisementPreviewPageState extends State<AdvertisementPreviewPage> {
                               extra,
                               _attachments,
                             );
+                            if (!mounted || !context.mounted) return;
                             setState(() => _submitting = false);
                             if (res is ResourceSuccess<AdEntity?>) {
                               HelperMethod.showSnackBar(
@@ -387,7 +391,7 @@ class _AdvertisementPreviewPageState extends State<AdvertisementPreviewPage> {
                               Navigator.of(context)
                                   .popUntil((route) => route.isFirst);
                             } else {
-                              final msg = (res as ResourceError).message;
+                              final msg = res.message;
                               HelperMethod.showSnackBar(
                                 context,
                                 msg ?? 'خطأ في النشر',

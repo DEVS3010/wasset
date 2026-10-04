@@ -217,17 +217,17 @@ class AdvertisementsCubit extends Cubit<AdvertisementsState> {
     }
     if (state.propertyType != null) {
       adsFilteringResult = adsFilteringResult!.where((ad) {
-        return ad.category!.id! == state.propertyType;
+        return ad.category?.id == state.propertyType;
       }).toList();
     }
     if (state.neighborhood != null) {
       adsFilteringResult = adsFilteringResult!.where((ad) {
-        return ad.neighborhood!.name == state.neighborhood;
+        return ad.neighborhood?.name == state.neighborhood;
       }).toList();
     }
     if (state.city != null) {
       adsFilteringResult = adsFilteringResult!.where((ad) {
-        return ad.city!.id == state.city;
+        return ad.city?.id == state.city;
       }).toList();
     }
     if (state.propertyAge != null) {
@@ -396,7 +396,7 @@ class AdvertisementsCubit extends Cubit<AdvertisementsState> {
     var adSearchResult = adsList;
     if (state.name != null) {
       adSearchResult = adSearchResult?.where((ad) {
-        return ad.city!.name.contains(state.name!);
+        return ad.city?.name.contains(state.name ?? '') ?? false;
       }).toList();
     }
     emit(

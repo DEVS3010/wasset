@@ -9,6 +9,7 @@ import 'package:waseet/features/user/domain/entities/category/category_entity.da
 import 'package:waseet/features/user/domain/entities/cities_entity.dart';
 import 'package:waseet/features/user/domain/entities/neighborhood_entity.dart';
 import 'package:waseet/features/user/domain/repositories/home_repository.dart';
+import 'package:waseet/res/api_failure.dart';
 import 'package:waseet/res/resource.dart';
 
 part 'add_new_ad_state.dart';
@@ -39,9 +40,15 @@ class AddNewAdCubit extends Cubit<AddNewAdState> {
           categories: categories.data,
           neighborhoods: neighborhoods.data,
           addAdRequest: state.addAdRequest.copyWith(
-            cityId: cities.data?.first.id,
-            categoryId: categories.data?.first.id,
-            neighborhoodId: neighborhoods.data?.first.id,
+            cityId: (cities.data?.isNotEmpty ?? false)
+                ? cities.data?.first.id
+                : null,
+            categoryId: (categories.data?.isNotEmpty ?? false)
+                ? categories.data?.first.id
+                : null,
+            neighborhoodId: (neighborhoods.data?.isNotEmpty ?? false)
+                ? neighborhoods.data?.first.id
+                : null,
           ),
         ),
       );
@@ -52,8 +59,12 @@ class AddNewAdCubit extends Cubit<AddNewAdState> {
         cities: cities.data,
         categories: categories.data,
         addAdRequest: state.addAdRequest.copyWith(
-          cityId: cities.data?.first.id,
-          categoryId: categories.data?.first.id,
+          cityId: (cities.data?.isNotEmpty ?? false)
+                ? cities.data?.first.id
+                : null,
+          categoryId: (categories.data?.isNotEmpty ?? false)
+                ? categories.data?.first.id
+                : null,
         ),
       ),
     );
@@ -68,7 +79,9 @@ class AddNewAdCubit extends Cubit<AddNewAdState> {
         neighborhoods: neighborhoods.data,
         addAdRequest: state.addAdRequest.copyWith(
           cityId: cityId,
-          neighborhoodId: neighborhoods.data?.first.id,
+          neighborhoodId: (neighborhoods.data?.isNotEmpty ?? false)
+                ? neighborhoods.data?.first.id
+                : null,
         ),
       ),
     );
@@ -79,6 +92,7 @@ class AddNewAdCubit extends Cubit<AddNewAdState> {
   }
 
   Future<void> addNewAd() async {
+    if (state.status == AddNewAdStatus.submitting) return;
     emit(state.copyWith(status: AddNewAdStatus.submitting));
     try {
       final response = await _adRepository.createAd(state.addAdRequest);
@@ -96,7 +110,7 @@ class AddNewAdCubit extends Cubit<AddNewAdState> {
       emit(
         state.copyWith(
           status: AddNewAdStatus.error,
-          errorMessage: e.toString(),
+          errorMessage: ApiFailure.fallback,
         ),
       );
     }
