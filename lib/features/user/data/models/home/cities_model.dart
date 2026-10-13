@@ -10,7 +10,7 @@ class CitiesModel extends Equatable {
         image: json['image'] as String?,
         createdAt: json['created_at'] == null
             ? null
-            : DateTime.parse(json['created_at'] as String),
+            : DateTime.tryParse(json['created_at'].toString()),
       );
   final int? id;
   final String? name;

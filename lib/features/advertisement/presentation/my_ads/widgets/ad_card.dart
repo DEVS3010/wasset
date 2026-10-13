@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:waseet/common_widgets/broker_item_icon.dart';
 import 'package:waseet/common_widgets/images_banner.dart';
 import 'package:waseet/features/advertisement/domain/entities/ad_entity.dart';
+import 'package:waseet/features/advertisement/domain/entities/advertisement_price.dart';
+import 'package:waseet/features/advertisement/presentation/ad_details/widgets/ad_regulatory_details.dart';
 import 'package:waseet/features/advertisement/presentation/advertisements/cubit/advertisements_cubit.dart';
 import 'package:waseet/features/advertisement/presentation/advertisements/widgets/advertisement_popup_menu_button.dart';
 import 'package:waseet/res/helper_method.dart';
@@ -125,30 +127,36 @@ class AdCard extends StatelessWidget {
                         ),
                         SizedBox(width: 16.w),
                         // price
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.attach_money,
-                              color: AppColors.primaryColor,
-                              size: 15.sp,
-                            ),
-                            Text(
-                              '${ad.price}',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 12.sp,
+                        Flexible(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.attach_money,
+                                color: AppColors.primaryColor,
+                                size: 15.sp,
                               ),
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              'ريال',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 12.sp,
+                              Flexible(
+                                child: Text(
+                                  _cardPriceText(ad),
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12.sp,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 4.w),
+                              Text(
+                                'ريال',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 12.sp,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         // 3 icons(chat, share, delete) with rounded container
                         // and opacity of primary color
@@ -202,23 +210,29 @@ class AdCard extends StatelessWidget {
                     SizedBox(
                       height: 10.h,
                     ),
-                    Row(
-                      children: [
-                        AdFeature(
-                          icon: Icons.align_vertical_center,
-                          text: '${ad.landSpace}  م',
-                        ),
-                        AdFeature(
-                          icon: Icons.bed,
-                          //TODO : change id with rooms num
-                          text: '${ad.id} غرف',
-                        ),
-                        AdFeature(
-                          icon: Icons.bathtub,
-                          //TODO : change id with bath num
-                          text: '${ad.id} حمام',
-                        ),
-                      ],
+                    // Horizontally scrollable so fixed feature chips cannot
+                    // overflow narrow screens (non-fatal stripe in release,
+                    // hard error under widget tests).
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          AdFeature(
+                            icon: Icons.align_vertical_center,
+                            text: '${ad.landSpace}  م',
+                          ),
+                          AdFeature(
+                            icon: Icons.bed,
+                            //TODO : change id with rooms num
+                            text: '${ad.id} غرف',
+                          ),
+                          AdFeature(
+                            icon: Icons.bathtub,
+                            //TODO : change id with bath num
+                            text: '${ad.id} حمام',
+                          ),
+                        ],
+                      ),
                     ),
                     SizedBox(
                       height: 10.h,
@@ -305,4 +319,13 @@ class AdFeature extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Card price resolved through [AdvertisementPriceResolver], shared by the
+/// advertisements list, favorites, and user ads so every card matches the
+/// details header. Rental amounts never gain an invented billing period.
+String _cardPriceText(AdEntity ad) {
+  final price = AdvertisementPriceResolver.resolve(ad);
+  if (!price.hasTotal) return unavailableAdValue;
+  return formatAdPriceAmount(price.total!);
 }

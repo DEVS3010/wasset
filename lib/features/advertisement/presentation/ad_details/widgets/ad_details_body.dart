@@ -3,8 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:waseet/common_widgets/broker_item_icon.dart';
 import 'package:waseet/common_widgets/images_banner.dart';
+import 'package:waseet/features/advertisement/domain/entities/ad_entity.dart';
+import 'package:waseet/features/advertisement/domain/entities/advertisement_price.dart';
 import 'package:waseet/features/advertisement/presentation/ad_details/cubit/cubit.dart';
-import 'package:waseet/features/advertisement/presentation/add_new_ad/widgets/review_ad_page.dart';
+import 'package:waseet/features/advertisement/presentation/ad_details/widgets/ad_regulatory_details.dart';
 import 'package:waseet/res/assets/assets.gen.dart';
 import 'package:waseet/res/helper_method.dart';
 import 'package:waseet/res/res.dart';
@@ -91,7 +93,7 @@ class AdDetailsBody extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        ad.category?.name ?? '',
+                        ad.category?.name ?? unavailableAdValue,
                         textAlign: TextAlign.right,
                         style: TextStyle(
                           fontSize: 16.sp,
@@ -110,11 +112,16 @@ class AdDetailsBody extends StatelessWidget {
                       size: 20.sp,
                     ),
                     SizedBox(width: 10.w),
-                    Text(
-                      '${ad.city?.name}, ${ad.neighborhood?.name}',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
+                    Expanded(
+                      child: Text(
+                        [ad.city?.name, ad.neighborhood?.name]
+                            .whereType<String>()
+                            .where((name) => name.isNotEmpty)
+                            .join('، '),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
@@ -128,18 +135,21 @@ class AdDetailsBody extends StatelessWidget {
                       height: 16.h,
                     ),
                     SizedBox(width: 10.w),
-                    Text(
-                      '${ad.price}',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w500,
+                    Expanded(
+                      child: Text(
+                        _headerPriceText(ad),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                    const Spacer(),
                     Text(
-                      (ad.negotiable ?? false)
-                          ? 'قابل للتفاوض'
-                          : 'غير قابل للتفاوض',
+                      ad.negotiable == null
+                          ? unavailableAdValue
+                          : ad.negotiable!
+                              ? 'قابل للتفاوض'
+                              : 'غير قابل للتفاوض',
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w500,
@@ -148,60 +158,7 @@ class AdDetailsBody extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 16.h),
-                TextRow(
-                  text: 'طريقة الدفع',
-                  value: ad.paymentMethod == 'cash' ? 'كاش' : 'تمويل',
-                ),
-                TextRow(
-                  text: 'المساحة',
-                  value: '${ad.landSpace} متر مربع',
-                ),
-                TextRow(
-                  text: 'سعر المتر',
-                  value: '${ad.meterPrice} ريال',
-                ),
-                // age
-                TextRow(
-                  text: 'عمر العقار',
-                  value: '${ad.propertyAge} سنة',
-                ),
-                // facade
-                TextRow(
-                  text: 'واجهة العقار',
-                  value: ad.facade == 'north'
-                      ? 'شمالية'
-                      : ad.facade == 'south'
-                          ? 'جنوبية'
-                          : ad.facade == 'east'
-                              ? 'شرقية'
-                              : ad.facade == 'west'
-                                  ? 'غربية'
-                                  : 'غير محددة',
-                ),
-                TextRow(
-                  text: 'عدد الشوارع',
-                  value: '${ad.streetsCount} شارع',
-                ),
-                // saudiCode
-                TextRow(
-                  text: 'الكود السعودي',
-                  value: ad.saudiCode ?? false ? 'نعم' : 'لا',
-                ),
-                // electricityMeter
-                TextRow(
-                  text: 'عداد الكهرباء',
-                  value: ad.electricityMeter ?? false ? 'نعم' : 'لا',
-                ),
-                // waterMeter
-                TextRow(
-                  text: 'عداد المياه',
-                  value: ad.waterMeter ?? false ? 'نعم' : 'لا',
-                ),
-                // sewerage
-                TextRow(
-                  text: 'الصرف الصحي',
-                  value: ad.sewerage ?? false ? 'نعم' : 'لا',
-                ),
+                AdRegulatoryDetails(ad: ad),
                 SizedBox(height: 16.h),
                 Column(
                   children: [
@@ -270,14 +227,16 @@ class AdDetailsBody extends StatelessWidget {
                     ),
                     SizedBox(height: 10.h),
                     InkWell(
-                      onTap: creatorId == null ? null : () {
-                        context.pushNamed(
-                          Screens.myPersonalOffice.name,
-                          extra: {
-                            'brokerId': ad.createdBy?.id,
-                          },
-                        );
-                      },
+                      onTap: creatorId == null
+                          ? null
+                          : () {
+                              context.pushNamed(
+                                Screens.myPersonalOffice.name,
+                                extra: {
+                                  'brokerId': ad.createdBy?.id,
+                                },
+                              );
+                            },
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
@@ -294,12 +253,16 @@ class AdDetailsBody extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 20.w,
-                              backgroundImage: ad.createdBy?.profile?.profileImage != null
-                                  ? adaptiveImageProvider(ad.createdBy?.profile?.profileImage)
-                                  : null,
-                              backgroundColor: ad.createdBy?.profile?.profileImage == null
-                                  ? AppColors.primaryColor
-                                  : null,
+                              backgroundImage:
+                                  ad.createdBy?.profile?.profileImage != null
+                                      ? adaptiveImageProvider(
+                                          ad.createdBy?.profile?.profileImage,
+                                        )
+                                      : null,
+                              backgroundColor:
+                                  ad.createdBy?.profile?.profileImage == null
+                                      ? AppColors.primaryColor
+                                      : null,
                               child: ad.createdBy?.profile?.profileImage == null
                                   ? const Icon(
                                       Icons.person,
@@ -308,38 +271,32 @@ class AdDetailsBody extends StatelessWidget {
                                   : null,
                             ),
                             SizedBox(width: 10.w),
-                            Text(
-                              ad.createdBy?.profile?.name ??
-                                  ad.createdBy?.name ??
-                                  '',
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w500,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    ad.createdBy?.profile?.name ??
+                                        ad.createdBy?.name ??
+                                        unavailableAdValue,
+                                  ),
+                                  Text(phone ?? unavailableAdValue),
+                                ],
                               ),
                             ),
                             SizedBox(width: 10.w),
-                            Text(
-                              ad.createdBy?.profile?.phone ??
-                                  ad.createdBy?.phone ??
-                                  '',
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const Spacer(),
                             // TODO: add call and message functionality
                             BrokerItemIcon(
                               onTap: () {
                                 if (ad.communicationMethod == 'call' &&
-                                    phone != null && phone.isNotEmpty) {
+                                    phone != null &&
+                                    phone.isNotEmpty) {
                                   HelperMethod.openCall(
                                     phone,
                                   );
                                 } else if (ad.communicationMethod ==
-                                    'whatsapp' && phone != null &&
+                                        'whatsapp' &&
+                                    phone != null &&
                                     phone.isNotEmpty) {
                                   HelperMethod.openWhatsapp(
                                     phone,
@@ -370,4 +327,14 @@ class AdDetailsBody extends StatelessWidget {
       },
     );
   }
+}
+
+/// Header price resolved through [AdvertisementPriceResolver]: legacy root
+/// price when valid, otherwise the authoritative regulatory price (land
+/// total for land ads, official property price otherwise). Rental amounts
+/// never gain an invented billing period.
+String _headerPriceText(AdEntity ad) {
+  final price = AdvertisementPriceResolver.resolve(ad);
+  if (!price.hasTotal) return unavailableAdValue;
+  return '${formatAdPriceAmount(price.total!)} ريال';
 }

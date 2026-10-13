@@ -80,7 +80,6 @@ class _AdvertiserCheckPageState extends State<AdvertiserCheckPage> {
     }
     setState(() => _submitting = false);
     final message = verifyRes.message;
-    log('AdvertiserCheckPage: verifyLicense error: $message');
     HelperMethod.showSnackBar(
       context,
       message ?? 'حدث خطأ',
@@ -254,14 +253,18 @@ class _AdvertisementPreviewPageState extends State<AdvertisementPreviewPage> {
                   _verticalKV(
                       'أنواع الاستخدام', listToString(verify?.propertyUsages),),
                   _verticalKV('تاريخ الإنشاء', verify?.creationDate ?? '-'),
-                  _verticalKV('تاريخ الانتهاء', verify?.endDate ?? '-'),
+                  _verticalKV(
+                    'تاريخ انتهاء رخصة الإعلان',
+                    verify?.endDate ?? '-',
+                  ),
                 ]),
                 
                 _sectionCard('جهة الاتصال', [
                   _verticalKV(
-                      'اسم المسؤول', verify?.advertiserName ?? '-',),
-                  _verticalKV('هاتف المسؤول',
-                      verify?.phoneNumber ?? '-',),
+                      'اسم مسؤول الإعلان',
+                      verify?.responsibleEmployeeName ?? '-',),
+                  _verticalKV('رقم جوال مسؤول الإعلان',
+                      verify?.responsibleEmployeePhoneNumber ?? '-',),
                   _verticalKV('رقم الجوال', verify?.phoneNumber ?? '-'),
                 ]),
                 _sectionCard('ملاحظات ومرفقات التراخيص', [
@@ -367,12 +370,22 @@ class _AdvertisementPreviewPageState extends State<AdvertisementPreviewPage> {
                         ? null
                         : () async {
                             if (_submitting) return;
-                            setState(() => _submitting = true);
                             final repo = context.read<AdRepository>();
                             final verify = widget.verify;
                             final advertiserId = verify?.advertiserId ?? '';
                             final adLicenseNumber =
                                 verify?.adLicenseNumber ?? '';
+                            if (advertiserId.trim().isEmpty ||
+                                adLicenseNumber.trim().isEmpty) {
+                              HelperMethod.showSnackBar(
+                                context,
+                                'بيانات الترخيص غير مكتملة. '
+                                'يرجى التحقق من الرخصة مجددًا.',
+                                type: SnackBarType.error,
+                              );
+                              return;
+                            }
+                            setState(() => _submitting = true);
                             final extra = _extraController.text.trim();
                             final res = await repo.createAdWithVerification(
                               advertiserId,

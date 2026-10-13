@@ -1,9 +1,19 @@
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
 import 'package:waseet/res/api_failure.dart';
 import 'package:waseet/res/resource.dart';
 
 /// A license field error alone is insufficient evidence of a duplicate.
 ResourceError<T> adFailure<T>(Object? error) {
   final failure = error is ApiFailure ? error : ApiFailure.fromBody(error);
+  if (kDebugMode) {
+    log(
+      'Advertisement request failed: type=${error.runtimeType}, '
+      'status=${failure.statusCode}',
+      name: 'Advertisement',
+    );
+  }
   final fields = failure.errors;
   final licenseError =
       fields?['adLicenseNumber'] ?? fields?['advertising_license_number'];

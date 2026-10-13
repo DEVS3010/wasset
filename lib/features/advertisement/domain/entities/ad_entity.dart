@@ -4,6 +4,8 @@ import 'package:waseet/features/user/domain/entities/category/category_entity.da
 import 'package:waseet/features/user/domain/entities/cities_entity.dart';
 import 'package:waseet/features/user/domain/entities/neighborhood_entity.dart';
 
+import 'package:waseet/features/advertisement/domain/entities/rega_compliance_entity.dart';
+
 class AdEntity {
   int? id;
   AdCreatorSummary? createdBy;
@@ -35,6 +37,7 @@ class AdEntity {
   int? advertisingLicenseNumber;
   List<String>? images;
   bool isFav;
+  RegaComplianceEntity? regaCompliance;
   AdEntity({
     this.id,
     this.createdBy,
@@ -66,5 +69,7 @@ class AdEntity {
     this.advertisingLicenseNumber,
     this.images,
     this.isFav = false,
+    this.regaCompliance,
   });
 }
+

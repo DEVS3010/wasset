@@ -1,0 +1,67 @@
+{
+  "baseline_total": 446,
+  "current_total": 443,
+  "current_severity": {
+    "error": 0,
+    "warning": 55,
+    "info": 388
+  },
+  "added": [
+    {
+      "severity": "info",
+      "file": "build/app/intermediates/assets/developmentDebug/mergeDevelopmentDebugAssets/flutter_assets/packages/pay_platform_interface/pubspec.yaml",
+      "rule": "sort_pub_dependencies",
+      "count": 1
+    },
+    {
+      "severity": "info",
+      "file": "build/app/intermediates/assets/productionDebug/mergeProductionDebugAssets/flutter_assets/packages/pay_platform_interface/pubspec.yaml",
+      "rule": "sort_pub_dependencies",
+      "count": 1
+    },
+    {
+      "severity": "info",
+      "file": "build/app/intermediates/assets/productionRelease/mergeProductionReleaseAssets/flutter_assets/packages/pay_platform_interface/pubspec.yaml",
+      "rule": "sort_pub_dependencies",
+      "count": 1
+    },
+    {
+      "severity": "info",
+      "file": "build/app/intermediates/flutter/developmentDebug/flutter_assets/packages/pay_platform_interface/pubspec.yaml",
+      "rule": "sort_pub_dependencies",
+      "count": 1
+    },
+    {
+      "severity": "info",
+      "file": "build/app/intermediates/flutter/productionDebug/flutter_assets/packages/pay_platform_interface/pubspec.yaml",
+      "rule": "sort_pub_dependencies",
+      "count": 1
+    },
+    {
+      "severity": "info",
+      "file": "build/app/intermediates/flutter/productionRelease/flutter_assets/packages/pay_platform_interface/pubspec.yaml",
+      "rule": "sort_pub_dependencies",
+      "count": 1
+    },
+    {
+      "severity": "info",
+      "file": "build/unit_test_assets/packages/pay_platform_interface/pubspec.yaml",
+      "rule": "sort_pub_dependencies",
+      "count": 1
+    }
+  ],
+  "removed": [
+    {
+      "severity": "info",
+      "file": "lib/features/advertisement/data/models/ad_model.dart",
+      "rule": "avoid_bool_literals_in_conditional_expressions",
+      "count": 7
+    },
+    {
+      "severity": "info",
+      "file": "lib/features/advertisement/presentation/ad_details/widgets/ad_details_body.dart",
+      "rule": "lines_longer_than_80_chars",
+      "count": 3
+    }
+  ]
+}

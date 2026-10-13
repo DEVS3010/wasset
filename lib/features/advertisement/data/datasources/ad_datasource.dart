@@ -237,10 +237,20 @@ class AdDatasource {
 
       if (response == null) return adFailure(null);
 
-      // parse response.data
-      final data = response['data'] as Map<String, dynamic>?;
-      if (data != null) {
-        final model = VerifyLicenseModel.fromMap(data);
+      // The Wasset envelope wraps the payload in `data`; the NHC payload
+      // itself may nest the advertisement under `result.advertisement`.
+      // VerifyLicenseModel unwraps both, so either shape parses safely.
+      final rawData = response['data'];
+      final candidate = rawData is Map<String, dynamic>
+          ? rawData
+          : rawData is Map
+              ? Map<String, dynamic>.from(rawData)
+              : response;
+      final model = VerifyLicenseModel.fromMap(candidate);
+      // A payload without license identifiers is not a usable verification.
+      // This keeps null/empty data a failure instead of an empty preview.
+      if ((model.adLicenseNumber?.trim().isNotEmpty ?? false) ||
+          (model.advertiserId?.trim().isNotEmpty ?? false)) {
         return Resource.success(model);
       }
       return adFailure(ApiFailure.fromBody(response));

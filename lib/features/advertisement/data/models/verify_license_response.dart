@@ -22,21 +22,21 @@ class VerifyLocationModel extends VerifyLocationEntity {
   factory VerifyLocationModel.fromMap(Map<String, dynamic>? map) {
     if (map == null) return VerifyLocationModel();
     return VerifyLocationModel(
-      region: map['region'] as String?,
-      regionCode: map['regionCode'] as String?,
-      city: map['city'] as String?,
-      cityCode: map['cityCode'] as String?,
-      district: map['district'] as String?,
-      districtCode: map['districtCode'] as String?,
-      street: map['street'] as String?,
-      postalCode: map['postalCode'] as String?,
-      buildingNumber: map['buildingNumber'] as String?,
-      additionalNumber: map['additionalNumber'] as String?,
-      longitude: map['longitude'] as String?,
-      latitude: map['latitude'] as String?,
-      districtId: map['districtId'] as String?,
-      cityId: map['cityId'] as String?,
-      regionId: map['regionId'] as String?,
+      region: _string(map['region']),
+      regionCode: _string(map['regionCode']),
+      city: _string(map['city']),
+      cityCode: _string(map['cityCode']),
+      district: _string(map['district']),
+      districtCode: _string(map['districtCode']),
+      street: _string(map['street']),
+      postalCode: _string(map['postalCode']),
+      buildingNumber: _string(map['buildingNumber']),
+      additionalNumber: _string(map['additionalNumber']),
+      longitude: _string(map['longitude']),
+      latitude: _string(map['latitude']),
+      districtId: _string(map['districtId']),
+      cityId: _string(map['cityId']),
+      regionId: _string(map['regionId']),
     );
   }
 }
@@ -60,18 +60,18 @@ class VerifyBordersModel extends VerifyBordersEntity {
   factory VerifyBordersModel.fromMap(Map<String, dynamic>? map) {
     if (map == null) return VerifyBordersModel();
     return VerifyBordersModel(
-      northLimitName: map['northLimitName'] as String?,
-      northLimitDescription: map['northLimitDescription'] as String?,
-      northLimitLengthChar: map['northLimitLengthChar'] as String?,
-      eastLimitName: map['eastLimitName'] as String?,
-      eastLimitDescription: map['eastLimitDescription'] as String?,
-      eastLimitLengthChar: map['eastLimitLengthChar'] as String?,
-      westLimitName: map['westLimitName'] as String?,
-      westLimitDescription: map['westLimitDescription'] as String?,
-      westLimitLengthChar: map['westLimitLengthChar'] as String?,
-      southLimitName: map['southLimitName'] as String?,
-      southLimitDescription: map['southLimitDescription'] as String?,
-      southLimitLengthChar: map['southLimitLengthChar'] as String?,
+      northLimitName: _string(map['northLimitName']),
+      northLimitDescription: _string(map['northLimitDescription']),
+      northLimitLengthChar: _string(map['northLimitLengthChar']),
+      eastLimitName: _string(map['eastLimitName']),
+      eastLimitDescription: _string(map['eastLimitDescription']),
+      eastLimitLengthChar: _string(map['eastLimitLengthChar']),
+      westLimitName: _string(map['westLimitName']),
+      westLimitDescription: _string(map['westLimitDescription']),
+      westLimitLengthChar: _string(map['westLimitLengthChar']),
+      southLimitName: _string(map['southLimitName']),
+      southLimitDescription: _string(map['southLimitDescription']),
+      southLimitLengthChar: _string(map['southLimitLengthChar']),
     );
   }
 }
@@ -126,51 +126,112 @@ class VerifyLicenseModel extends VerifyLicenseEntity {
 
   factory VerifyLicenseModel.fromMap(Map<String, dynamic>? map) {
     if (map == null) return VerifyLicenseModel();
+    // The Wasset envelope wraps payloads in `data`, while NHC payloads may
+    // nest the advertisement under `result.advertisement`. Unwrap both so the
+    // Wasset wrapper is never confused with the NHC advertisement object.
+    final payload = _advertisementPayload(map);
     return VerifyLicenseModel(
-      advertiserId: map['advertiserId'] as String?,
-      adLicenseNumber: map['adLicenseNumber'] as String?,
-      deedNumber: map['deedNumber'] as String?,
-      advertiserName: map['advertiserName'] as String?,
-      responsibleEmployeeName: map['responsibleEmployeeName'] as String?,
-      responsibleEmployeePhoneNumber: map['responsibleEmployeePhoneNumber'] as String?,
-      phoneNumber: map['phoneNumber'] as String?,
-      brokerageAndMarketingLicenseNumber: map['brokerageAndMarketingLicenseNumber'] as String?,
-      isConstrained: map['isConstrained'] as bool?,
-      isPawned: map['isPawned'] as bool?,
-      isHalted: map['isHalted'] as bool?,
-      isTestment: map['isTestment'] as bool?,
-      rerConstraints: map['rerConstraints'],
-      streetWidth: map['streetWidth'] as num?,
-      propertyArea: map['propertyArea'] as num?,
-      propertyPrice: map['propertyPrice'] as num?,
-      landTotalPrice: map['landTotalPrice'] as num?,
-      landTotalAnnualRent: map['landTotalAnnualRent'] as num?,
-      numberOfRooms: map['numberOfRooms'] as int?,
-      propertyType: map['propertyType'] as String?,
-      propertyAge: map['propertyAge'] as String?,
-      advertisementType: map['advertisementType'] as String?,
-      location: VerifyLocationModel.fromMap(map['location'] as Map<String, dynamic>?),
-      propertyFace: map['propertyFace'] as String?,
-      planNumber: map['planNumber'] as String?,
-      landNumber: map['landNumber'] as String?,
-      obligationsOnTheProperty: map['obligationsOnTheProperty'] as String?,
-      guaranteesAndTheirDuration: map['guaranteesAndTheirDuration'] as String?,
-      complianceWithTheSaudiBuildingCode: map['complianceWithTheSaudiBuildingCode'] as bool?,
-      channels: (map['channels'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
-      propertyUsages: map['propertyUsages'] as List<dynamic>?,
-      mainLandUseTypeName: map['mainLandUseTypeName'] as String?,
-      redZoneTypeName: map['redZoneTypeName'] as String?,
-      propertyUtilities: (map['propertyUtilities'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
-      creationDate: map['creationDate'] as String?,
-      endDate: map['endDate'] as String?,
-      adLicenseUrl: map['adLicenseUrl'] as String?,
-      adSource: map['adSource'] as String?,
-      titleDeedTypeName: map['titleDeedTypeName'] as String?,
-      locationDescriptionOnMOJDeed: map['locationDescriptionOnMOJDeed'] as String?,
-      notes: map['notes'] as String?,
-      borders: VerifyBordersModel.fromMap(map['borders'] as Map<String, dynamic>?),
-      rerBorders: map['rerBorders'] as List<dynamic>?,
-      ownershipTransferFeeType: map['ownershipTransferFeeType'] as String?,
+      advertiserId: _string(payload['advertiserId']),
+      adLicenseNumber: _string(payload['adLicenseNumber']),
+      deedNumber: _string(payload['deedNumber']),
+      advertiserName: _string(payload['advertiserName']),
+      responsibleEmployeeName: _string(payload['responsibleEmployeeName']),
+      responsibleEmployeePhoneNumber:
+          _string(payload['responsibleEmployeePhoneNumber']),
+      phoneNumber: _string(payload['phoneNumber']),
+      brokerageAndMarketingLicenseNumber:
+          _string(payload['brokerageAndMarketingLicenseNumber']),
+      isConstrained: payload['isConstrained'] as bool?,
+      isPawned: payload['isPawned'] as bool?,
+      isHalted: payload['isHalted'] as bool?,
+      isTestment: payload['isTestment'] as bool?,
+      rerConstraints: payload['rerConstraints'],
+      streetWidth: _num(payload['streetWidth']),
+      propertyArea: _num(payload['propertyArea']),
+      propertyPrice: _num(payload['propertyPrice']),
+      landTotalPrice: _num(payload['landTotalPrice']),
+      landTotalAnnualRent: _num(payload['landTotalAnnualRent']),
+      numberOfRooms: _int(payload['numberOfRooms']),
+      propertyType: _string(payload['propertyType']),
+      propertyAge: _string(payload['propertyAge']),
+      advertisementType: _string(payload['advertisementType']),
+      location:
+          VerifyLocationModel.fromMap(_map(payload['location'])),
+      propertyFace: _string(payload['propertyFace']),
+      planNumber: _string(payload['planNumber']),
+      landNumber: _string(payload['landNumber']),
+      obligationsOnTheProperty: _string(payload['obligationsOnTheProperty']),
+      guaranteesAndTheirDuration:
+          _string(payload['guaranteesAndTheirDuration']),
+      complianceWithTheSaudiBuildingCode:
+          payload['complianceWithTheSaudiBuildingCode'] as bool?,
+      channels: _stringList(payload['channels']),
+      propertyUsages: payload['propertyUsages'] is List
+          ? payload['propertyUsages'] as List<dynamic>
+          : null,
+      mainLandUseTypeName: _string(payload['mainLandUseTypeName']),
+      redZoneTypeName: _string(payload['redZoneTypeName']),
+      propertyUtilities: _stringList(payload['propertyUtilities']),
+      creationDate: _string(payload['creationDate']),
+      endDate: _string(payload['endDate']),
+      adLicenseUrl: _string(payload['adLicenseUrl']),
+      adSource: _string(payload['adSource']),
+      titleDeedTypeName: _string(payload['titleDeedTypeName']),
+      locationDescriptionOnMOJDeed:
+          _string(payload['locationDescriptionOnMOJDeed']),
+      notes: _string(payload['notes']),
+      borders: VerifyBordersModel.fromMap(_map(payload['borders'])),
+      rerBorders: payload['rerBorders'] is List
+          ? payload['rerBorders'] as List<dynamic>
+          : null,
+      ownershipTransferFeeType: _string(payload['ownershipTransferFeeType']),
     );
   }
+
+  static Map<String, dynamic> _advertisementPayload(Map<String, dynamic> map) {
+    if (map.containsKey('adLicenseNumber') ||
+        map.containsKey('advertiserId')) {
+      return map;
+    }
+    final advertisement = _map(map['advertisement']);
+    if (advertisement != null) return _advertisementPayload(advertisement);
+    final result = _map(map['result']);
+    if (result != null) return _advertisementPayload(result);
+    final data = _map(map['data']);
+    if (data != null) return _advertisementPayload(data);
+    return map;
+  }
+}
+
+String? _string(Object? value) {
+  if (value == null) return null;
+  if (value is String) return value;
+  return value.toString();
+}
+
+num? _num(Object? value) {
+  if (value is num) return value;
+  if (value is String) return num.tryParse(value.trim());
+  return null;
+}
+
+int? _int(Object? value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value.trim());
+  return null;
+}
+
+List<String> _stringList(Object? value) {
+  if (value is! List) return [];
+  return value
+      .map((e) => e?.toString() ?? '')
+      .where((e) => e.isNotEmpty)
+      .toList();
+}
+
+Map<String, dynamic>? _map(Object? value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return Map<String, dynamic>.from(value);
+  return null;
 }

@@ -59,10 +59,8 @@ class ApiService {
   }) async {
     headers = await addToken(headers);
 
-    late Response<T> res;
     try {
-      await _dio
-          .get<T>(
+      final res = await _dio.get<T>(
         path,
         onReceiveProgress: onReceiveProgress,
         queryParameters: queryParameters,
@@ -70,24 +68,7 @@ class ApiService {
           headers: headers,
           extra: extra,
         ),
-      )
-          .then((value) {
-        if (value.statusCode == 200) {
-          res = value;
-        }
-        if (value.statusCode == 401) {
-          wassetSharedPreferences.removeToken();
-        }
-        if (value.statusCode == 408) {
-          get<T>(
-            path,
-            queryParameters: queryParameters,
-            extra: extra,
-            headers: headers,
-            onReceiveProgress: onReceiveProgress,
-          );
-        }
-      });
+      );
       return res.data;
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
@@ -139,9 +120,7 @@ class ApiService {
       //   "content-type": "multipart/form-data"
       // });
 
-      late Response<T> res;
-      await _dio
-          .put<T>(
+      final res = await _dio.put<T>(
         path,
         data: data,
         onSendProgress: onSendProgress,
@@ -151,25 +130,7 @@ class ApiService {
           headers: headers,
           extra: extra,
         ),
-      )
-          .then((value) {
-        if (value.statusCode == 200) {
-          res = value;
-        }
-        if (value.statusCode == 201) {
-          res = value;
-        }
-        if (value.statusCode == 408) {
-          post<T>(
-            path,
-            data: data,
-            onReceiveProgress: onReceiveProgress,
-            headers: headers,
-            extra: extra,
-            queryParameters: queryParameters,
-          );
-        }
-      });
+      );
       return res.data;
     } on DioException catch (e) {
       errorInterceptor(e);
@@ -189,10 +150,8 @@ class ApiService {
   }) async {
     headers = await addToken(headers);
 
-    late Response<T> res;
     try {
-      await _dio
-          .patch<T>(
+      final res = await _dio.patch<T>(
         path,
         data: data,
         onSendProgress: onSendProgress,
@@ -202,22 +161,7 @@ class ApiService {
           headers: headers,
           extra: extra,
         ),
-      )
-          .then((value) {
-        if (value.statusCode == 200) {
-          res = value;
-        }
-        if (value.statusCode == 408) {
-          post<T>(
-            path,
-            data: data,
-            onReceiveProgress: onReceiveProgress,
-            headers: headers,
-            extra: extra,
-            queryParameters: queryParameters,
-          );
-        }
-      });
+      );
       return res.data;
     } on DioException catch (e) {
       errorInterceptor(e);
