@@ -77,9 +77,8 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "sa.morph.waseet1"
-        // Pinned instead of flutter.minSdkVersion: that resolves to 21 on Flutter < 3.35,
-        // which breaks the manifest merge against firebase_storage's minSdk 23 requirement.
-        minSdkVersion 23
+        // Flutter 3.44 requires Android API 24 or newer.
+        minSdkVersion 24
         targetSdk = 36
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
